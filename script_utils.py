@@ -1,6 +1,9 @@
 #
 # Utils for package managment
 #
+import re
+import subprocess
+
 from argparse import ArgumentParser
 
 def get_args(cmd_args, _description=None):
@@ -43,3 +46,28 @@ def get_config(config_file):
 			pass
 		cfgs.append(option)
 	return cfgs
+
+
+def grep_tstamp(run_log_path):
+	"""
+	Gets time and date from run log of phantom run and returns them as variables.
+	In:
+		> run_log_path (str or path) - path to run_log file
+	Out:
+		> time (str) - time string
+		> date (str) - date string
+	"""
+	grep_pattern = r'Run finished on'
+	grep_command = ['grep', '-e', grep_pattern, run_log_path]
+	result = subprocess.run(grep_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+	if result.stdout:
+		re_pattern = r"([0-9]{2}\/[0-9]{2}\/[0-9]{4}) at ([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9])"
+		match = re.search(re_pattern, result.stdout)
+		if match:
+			date = match.group(1)
+			time = match.group(2)
+			return date, time
+	else:
+		print("Timestamp not found in file, please check your run log.")
+		return None, None

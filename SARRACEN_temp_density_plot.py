@@ -20,18 +20,20 @@ _description = "A script to plot temp against density from PHANTOM SPH simulatio
 
 config_file, data_dir, output_dir, store_data, store_plot, N_densest, run_log_path = su.get_args(cmd_args) # Get command line args
 
-if config_file: # If config file present, use that
+# If config file present, use that
+if config_file:
 	data_dir, output_dir, store_data, store_plot, N_densest, run_log_path = su.get_config(config_file)
 
-if (store_data==True or store_plot==True) and not output_dir: # If store option selected, ensure an output path is present
+# Check for output dir
+while (store_data==True or store_plot==True) and not output_dir: # If store option selected, ensure an output path is present
 	output_dir = input("No output path provided. Please provide an output path if you wish to save data OR plot (abs path to directory required):")
-	if not os.path.exists(output_dir):
-		ask_make_path = input("Output path does not exist, create?")
-		if ask_make_path in ['yes', 'y', 'YES', 'Yes', 'Y']:
-			os.mkdir(output_dir)
-		else:
-			print("Cannot proceed without output path. Exiting.")
-			sys.exit()
+if not os.path.exists(output_dir):
+	ask_make_path = input("Output path does not exist, create?")
+	if ask_make_path in ['yes', 'y', 'YES', 'Yes', 'Y']:
+		os.mkdir(output_dir)
+	else:
+		print("Cannot proceed without output path. Exiting.")
+		sys.exit()
 
 
 # DATA PROCESSING: The interesting stuff
@@ -42,6 +44,7 @@ def get_densest(sdf, N):
 	"""
 	return sdf.sort_values(by='rho', ascending=False).head(N)
 
+# Sort files
 print("reading in data")
 date, time = su.grep_tstamp(run_log_path)
 fins_all = np.sort([file for file in os.listdir(data_dir) if re.match('colltest_[0-9].', file)]) # Sort files by asc. timestep

@@ -5,8 +5,10 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 import script_utils as su
+import data_utils as du
 
 # HOUSEKEEPING: Command line arguments or config options are processed here
 cmd_args = [['--config_file', '-c', 'store', 'config_file', 'Use config file instead of cmd input?'],
@@ -68,6 +70,10 @@ for fin in fins:
 	densest = get_densest(sdf, N_densest)
 	temps_avg.append(np.mean(densest['temperature']))
 	rhos_avg.append(np.mean(densest['rho']))
+temps_max = np.array(temps_max)
+rhos_max = np.array(rhos_max)
+temps_avg = np.array(temps_avg)
+rhos_avg = np.array(rhos_avg)
 
 # Convert rhos
 rhos_avg_conv = du.convert_rho_units(rhos_avg)
@@ -75,17 +81,17 @@ rhos_avg_conv = du.convert_rho_units(rhos_avg)
 # Writing to file
 save_path = output_dir + time + "_" + date.replace('/', '.')
 if store_data:
-	sdf.loc[:, ['temperature', 'rho']].to_csv(save_path + ".dat")
+	pd.DataFrame(data={'density [g/cm3]': rhos_avg_conv, 'temperature [K]': temps_avg}).to_csv(save_path + ".dat", index=False)
 
 
 # PLOTTING
 print("plotting")
 fig, ax = plt.subplots()
-ax.loglog(rhos_max, temps_max, label='maxima')
-ax.loglog(rhos_avg, temps_avg, label='means')
+ax.loglog(du.convert_rho_units(rhos_max), temps_max, label='maxima')
+ax.loglog(rhos_avg_conv, temps_avg, label='means')
 ax.legend()
-ax.set_xlabel('Density [a.u.]')
-ax.set_ylabel('Temperature [a.u.]')
+ax.set_xlabel('Density [g/cm3]')
+ax.set_ylabel('Temperature [K]')
 title = "Finished on {}, {}".format(time, date)
 ax.set_title(title)
 if store_plot:

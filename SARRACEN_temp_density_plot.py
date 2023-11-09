@@ -16,9 +16,9 @@ cmd_args = [['--config_file', '-c', 'store', 'config_file', 'Use config file ins
 		['--store_plot', '-sp', 'store_true', 'store_plot', 'Whether to save the plot into output'],
 		['--N_densest', '-N', 'store', 'N_densest', 'Number of densest particles to average ovrer'],
 		['--run_log', '-rl', 'store', 'run_log_path', 'Path to the run log of this simulation']]
-_description = "A script to plot temp against density from PHANTOM SPH simulations using the SARRACEN package."
+description = "A script to plot temp against density from PHANTOM SPH simulations using the SARRACEN package."
 
-config_file, data_dir, output_dir, store_data, store_plot, N_densest, run_log_path = su.get_args(cmd_args) # Get command line args
+config_file, data_dir, output_dir, store_data, store_plot, N_densest, run_log_path = su.get_args(cmd_args, _description=description) # Get command line args
 
 # If config file present, use that
 if config_file:
@@ -68,6 +68,9 @@ for fin in fins:
 	densest = get_densest(sdf, N_densest)
 	temps_avg.append(np.mean(densest['temperature']))
 	rhos_avg.append(np.mean(densest['rho']))
+
+# Convert rhos
+rhos_avg_conv = du.convert_rho_units(rhos_avg)
 
 # Writing to file
 save_path = output_dir + time + "_" + date.replace('/', '.')

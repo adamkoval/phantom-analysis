@@ -17,14 +17,15 @@ cmd_args = [['--config_file', '-c', 'store', 'config_file', 'Use config file ins
 		['--store_data', '-sd', 'store_true', 'store_data', 'Whether to save the data into output'],
 		['--store_plot', '-sp', 'store_true', 'store_plot', 'Whether to save the plot into output'],
 		['--N_densest', '-N', 'store', 'N_densest', 'Number of densest particles to average ovrer'],
-		['--run_log', '-rl', 'store', 'run_log_path', 'Path to the run log of this simulation']]
+		['--run_log', '-rl', 'store', 'run_log_path', 'Path to the run log of this simulation'],
+		['--comp_files', '-cf', 'store', 'comp_file_paths', 'Paths of comparison files']]
 description = "A script to plot temp against density from PHANTOM SPH simulations using the SARRACEN package."
 
-config_file, data_dir, output_dir, store_data, store_plot, N_densest, run_log_path = su.get_args(cmd_args, _description=description) # Get command line args
+config_file, data_dir, output_dir, store_data, store_plot, N_densest, run_log_path, comp_file_paths = su.get_args(cmd_args, _description=description) # Get command line args
 
 # If config file present, use that
 if config_file:
-	data_dir, output_dir, store_data, store_plot, N_densest, run_log_path = su.get_config(config_file)
+	data_dir, output_dir, store_data, store_plot, N_densest, run_log_path, comp_file_paths = su.get_config(config_file)
 
 # Check for output dir
 while (store_data==True or store_plot==True) and not output_dir: # If store option selected, ensure an output path is present
@@ -83,12 +84,23 @@ save_path = output_dir + time + "_" + date.replace('/', '.')
 if store_data:
 	pd.DataFrame(data={'density [g/cm3]': rhos_avg_conv, 'temperature [K]': temps_avg}).to_csv(save_path + ".dat", index=False)
 
+# Reading in comparison files
+fin_lomb_merc, fin_stam_merc, fin_stam_max = [i.strip() for i in comp_file_paths.split(',')]
+dat_lomb_merc = pd.read_csv(fin_lomb_merc, names=['density [g/cm3]', 'temperature [K]'])
+dat_stam_merc = pd.read_csv(fin_lomb_merc, names=['density [g/cm3]', 'temperature [K]'])
+dat_stam_max = pd.read_csv(fin_stam_max, comment='#', delim_whitespace=True, header=None)[[6, 7]]
+dat_stam_max.columns = ['density [g/cm3]', 'temperature [K]']
+
 
 # PLOTTING
 print("plotting")
 fig, ax = plt.subplots()
 ax.loglog(du.convert_rho_units(rhos_max), temps_max, label='maxima')
 ax.loglog(rhos_avg_conv, temps_avg, label='means')
+ax.loglog(dat_lomb_merc['density [g/cm3]'], dat_lomb_merc['temperature [K]'], label='Lombardi-Mercer')
+ax.loglog(dat_stam_merc['density [g/cm3]'], dat_stam_merc['temperature [K]'], label='Stamatellos-Mercer')
+ax.loglog(dat_stam_max['density [g/cm3]'], dat_stam_max['temperature [K]'], label='Stamatellos maxvals')
+
 ax.legend()
 ax.set_xlabel('Density [g/cm3]')
 ax.set_ylabel('Temperature [K]')

@@ -107,5 +107,5 @@ ax.set_ylabel('Temperature [K]')
 title = "Finished on {}, {}".format(time, date)
 ax.set_title(title)
 if store_plot:
-	plt.savefig(save_path + "_fig", format='png')
+	plt.savefig(save_path + "_fig.png", format='png')
 plt.show()

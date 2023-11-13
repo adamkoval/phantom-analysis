@@ -73,15 +73,16 @@ try:
 except:
 	pass
 ax.loglog(rhos_avg, temps_avg, label='means')
-ax.loglog(dat_lomb_merc['density [g/cm3]'], dat_lomb_merc['temperature [K]'], label='Lombardi-Mercer')
-ax.loglog(dat_stam_merc['density [g/cm3]'], dat_stam_merc['temperature [K]'], label='Stamatellos-Mercer')
-ax.loglog(dat_stam_max['density [g/cm3]'], dat_stam_max['temperature [K]'], label='Stamatellos maxvals')
+ax.loglog(dat_lomb_merc['density [g/cm3]'], dat_lomb_merc['temperature [K]'], label='Lombardi-Mercer', ls='--')
+ax.loglog(dat_stam_merc['density [g/cm3]'], dat_stam_merc['temperature [K]'], label='Stamatellos-Mercer', ls='--')
+ax.loglog(dat_stam_max['density [g/cm3]'], dat_stam_max['temperature [K]'], label='Stamatellos maxvals', ls='--')
 
 ax.legend()
 ax.set_xlabel('Density [g/cm3]')
 ax.set_ylabel('Temperature [K]')
 title = "Finished on {}, {}".format(time, date)
 ax.set_title(title)
+ax.grid()
 if store_plot:
 	plt.savefig(save_path + "_fig.png", format='png')
 plt.show()

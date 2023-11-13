@@ -87,7 +87,7 @@ if store_data:
 # Reading in comparison files
 fin_lomb_merc, fin_stam_merc, fin_stam_max = [i.strip() for i in comp_file_paths.split(',')]
 dat_lomb_merc = pd.read_csv(fin_lomb_merc, names=['density [g/cm3]', 'temperature [K]'])
-dat_stam_merc = pd.read_csv(fin_lomb_merc, names=['density [g/cm3]', 'temperature [K]'])
+dat_stam_merc = pd.read_csv(fin_stam_merc, names=['density [g/cm3]', 'temperature [K]'])
 dat_stam_max = pd.read_csv(fin_stam_max, comment='#', delim_whitespace=True, header=None)[[6, 7]]
 dat_stam_max.columns = ['density [g/cm3]', 'temperature [K]']
 

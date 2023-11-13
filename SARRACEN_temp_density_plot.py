@@ -1,4 +1,3 @@
-import sarracen
 import os
 import re
 import sys
@@ -40,49 +39,23 @@ if not os.path.exists(output_dir):
 
 
 # DATA PROCESSING: The interesting stuff
-def get_densest(sdf, N):
-	"""
-	sdf - dataframe with sim data
-	N - number of densest
-	"""
-	return sdf.sort_values(by='rho', ascending=False).head(N)
+# Progress update
+print("reading in data")
+
+# Get simulation info from run log
+date, time = su.grep_tstamp(run_log_path)
+save_path = output_dir + ''.join(date.split('/')[::-1]) + '_' + time.replace(':', '')
 
 # Sort files
-print("reading in data")
-date, time = su.grep_tstamp(run_log_path)
 fins_all = np.sort([file for file in os.listdir(data_dir) if re.match('colltest_[0-9].', file)]) # Sort files by asc. timestep
 fins = fins_all#[:2] # Used for debugging
 
-# Parsing the data with SARRACEN
-temps_max = []
-rhos_max = []
-temps_avg = []
-rhos_avg = []
-for fin in fins:
-	print("Working on file {}".format(fin))
-	fin = data_dir + fin
-	sdf = sarracen.read_phantom(fin) # Read in using Sarracen
-	sdf.calc_density() # Calculate density using Sarracen
-
-	# Append to lists
-	temps_max.append(np.max(sdf['temperature']))
-	rhos_max.append(np.max(sdf['rho']))
-
-	densest = get_densest(sdf, N_densest)
-	temps_avg.append(np.mean(densest['temperature']))
-	rhos_avg.append(np.mean(densest['rho']))
-temps_max = np.array(temps_max)
-rhos_max = np.array(rhos_max)
-temps_avg = np.array(temps_avg)
-rhos_avg = np.array(rhos_avg)
-
-# Convert rhos
-rhos_avg_conv = du.convert_rho_units(rhos_avg)
-
-# Writing to file
-save_path = output_dir + ''.join(date.split('/')[::-1]) + '_' + time.replace(':', '')
-if store_data:
-	pd.DataFrame(data={'density [g/cm3]': rhos_avg_conv, 'temperature [K]': temps_avg}).to_csv(save_path + ".dat", index=False)
+# Check if analysis has been done
+if any(save_path.split('/')[-1] in file for file in os.listdir(output_dir)):
+	rhos_avg, temps_avg = du.read_existing_analysis(save_path + ".dat")
+else:
+	# Parsing the data with SARRACEN
+	rhos_max, temps_max, rhos_avg, temps_avg = du.parse_with_SARRACEN(data_dir, fins, save_path, N_densest, store_data)
 
 # Reading in comparison files
 fin_lomb_merc, fin_stam_merc, fin_stam_max = [i.strip() for i in comp_file_paths.split(',')]
@@ -95,8 +68,11 @@ dat_stam_max.columns = ['density [g/cm3]', 'temperature [K]']
 # PLOTTING
 print("plotting")
 fig, ax = plt.subplots()
-ax.loglog(du.convert_rho_units(rhos_max), temps_max, label='maxima')
-ax.loglog(rhos_avg_conv, temps_avg, label='means')
+try:
+	ax.loglog(rhos_max, temps_max, label='maxima')
+except:
+	pass
+ax.loglog(rhos_avg, temps_avg, label='means')
 ax.loglog(dat_lomb_merc['density [g/cm3]'], dat_lomb_merc['temperature [K]'], label='Lombardi-Mercer')
 ax.loglog(dat_stam_merc['density [g/cm3]'], dat_stam_merc['temperature [K]'], label='Stamatellos-Mercer')
 ax.loglog(dat_stam_max['density [g/cm3]'], dat_stam_max['temperature [K]'], label='Stamatellos maxvals')

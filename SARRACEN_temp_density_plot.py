@@ -51,7 +51,7 @@ def get_densest(sdf, N):
 print("reading in data")
 date, time = su.grep_tstamp(run_log_path)
 fins_all = np.sort([file for file in os.listdir(data_dir) if re.match('colltest_[0-9].', file)]) # Sort files by asc. timestep
-fins = fins_all[:2]
+fins = fins_all#[:2] # Used for debugging
 
 # Parsing the data with SARRACEN
 temps_max = []
@@ -80,7 +80,7 @@ rhos_avg = np.array(rhos_avg)
 rhos_avg_conv = du.convert_rho_units(rhos_avg)
 
 # Writing to file
-save_path = output_dir + time + "_" + date.replace('/', '.')
+save_path = output_dir + ''.join(date.split('/')[::-1] + '_' + time.replace(':', '')
 if store_data:
 	pd.DataFrame(data={'density [g/cm3]': rhos_avg_conv, 'temperature [K]': temps_avg}).to_csv(save_path + ".dat", index=False)
 

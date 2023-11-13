@@ -80,7 +80,7 @@ rhos_avg = np.array(rhos_avg)
 rhos_avg_conv = du.convert_rho_units(rhos_avg)
 
 # Writing to file
-save_path = output_dir + ''.join(date.split('/')[::-1] + '_' + time.replace(':', '')
+save_path = output_dir + ''.join(date.split('/')[::-1]) + '_' + time.replace(':', '')
 if store_data:
 	pd.DataFrame(data={'density [g/cm3]': rhos_avg_conv, 'temperature [K]': temps_avg}).to_csv(save_path + ".dat", index=False)
 

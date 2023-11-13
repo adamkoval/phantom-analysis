@@ -72,14 +72,14 @@ try:
 	ax.loglog(rhos_max, temps_max, label='maxima')
 except:
 	pass
-ax.loglog(rhos_avg, temps_avg, label='means')
-ax.loglog(dat_lomb_merc['density [g/cm3]'], dat_lomb_merc['temperature [K]'], label='Lombardi-Mercer', ls='--')
-ax.loglog(dat_stam_merc['density [g/cm3]'], dat_stam_merc['temperature [K]'], label='Stamatellos-Mercer', ls='--')
-ax.loglog(dat_stam_max['density [g/cm3]'], dat_stam_max['temperature [K]'], label='Stamatellos maxvals', ls='--')
+ax.loglog(rhos_avg, temps_avg, label='Stamatellos ($N_{avg}=200$)', color='r')
+ax.loglog(dat_lomb_merc['density [g/cm3]'], dat_lomb_merc['temperature [K]'], label='Lombardi-Mercer+2018', ls='--', color='g')
+ax.loglog(dat_stam_merc['density [g/cm3]'], dat_stam_merc['temperature [K]'], label='Stamatellos-Mercer+2018', ls='--', color='k')
+#ax.loglog(dat_stam_max['density [g/cm3]'], dat_stam_max['temperature [K]'], label='Stamatellos maxvals', ls='--')
 
 ax.legend()
-ax.set_xlabel('Density [g/cm3]')
-ax.set_ylabel('Temperature [K]')
+ax.set_xlabel('Density (g cm$^{-3}$)')
+ax.set_ylabel('Temperature (K)')
 title = "Finished on {}, {}".format(time, date)
 ax.set_title(title)
 ax.grid()

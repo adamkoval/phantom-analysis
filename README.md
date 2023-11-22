@@ -1,5 +1,5 @@
 # Quick description
-For now this package is in its infancy, and who knows how useful it will be in the end. Anyways, I need to back things up and perhaps it wouldn't hurt to practice some version control.
+For now this package is in its infancy, and who knows how useful it will be in the end. Anyways, I need to back things up and it wouldn't hurt to get back in the swing of version control.
 
 Quick summary of the files here:
 1. script\_utils.py - the main handler of all script stuff like arguments, importing stuff, etc.
